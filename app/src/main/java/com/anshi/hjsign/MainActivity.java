@@ -15,6 +15,10 @@
 package com.anshi.hjsign;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -52,18 +56,50 @@ public class MainActivity extends Activity {
     private List<RoomEntry> mSecondTopList = new ArrayList<>();
     private CommonAdapter<RoomEntry> commonAdapter;
     private CommonAdapter<RoomEntry> mSecondAdapter;
+    private TextView mCalendarDay;
+    private TextView mCalendarDate;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_main);
         initView();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_DATE_CHANGED);
+        registerReceiver(usBroadcastReceiver, filter);
         initData();
     }
 
+    /**
+     * 时间切换的广播接收者
+     */
+    private BroadcastReceiver usBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (null!=action){
+                switch (action){
+                    case Intent.ACTION_DATE_CHANGED:
+                        mCalendarDay.setText(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
+                        mCalendarDate.setText(getDate());
+                        break;
 
+                }
+            }
+        }
+    };
+
+    /**
+     * 记得销毁广播,防止内存泄漏
+     */
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(usBroadcastReceiver);
+        super.onDestroy();
+
+    }
     private void initView() {
-        TextView mCalendarDay = findViewById(R.id.calendar_day);
-        TextView mCalendarDate = findViewById(R.id.calendar_date);
+        mCalendarDay = findViewById(R.id.calendar_day);
+        mCalendarDate = findViewById(R.id.calendar_date);
         mCalendarDay.setText(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
         mCalendarDate.setText(getDate());
         mLeftRecyclerView = findViewById(R.id.left_recycler);
