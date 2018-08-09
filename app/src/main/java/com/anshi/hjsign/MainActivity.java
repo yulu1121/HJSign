@@ -103,9 +103,9 @@ public class MainActivity extends Activity {
         mCalendarDay.setText(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
         mCalendarDate.setText(getDate());
         mLeftRecyclerView = findViewById(R.id.left_recycler);
-        mLeftRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        mLeftRecyclerView.setLayoutManager(new GridLayoutManager(this,6));
         mRightRecyclerView = findViewById(R.id.right_recycler);
-        mRightRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        mRightRecyclerView.setLayoutManager(new GridLayoutManager(this,10));
         commonAdapter = new CommonAdapter<RoomEntry>(this,R.layout.room_check,mTopList) {
             @Override
             protected void convert(ViewHolder holder, RoomEntry roomEntry, int position) {
