@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/border_shape"
+    android:layout_height="180dp">
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="vertical"
+       tools:ignore="UselessParent">
+       <Button
+           android:layout_width="match_parent"
+           android:layout_height="30dp"
+           android:layout_marginTop="5dp"
+           android:textColor="#FFF"
+           android:background="@drawable/welcome_btn_selector"
+           android:layout_marginStart="10dp"
+           android:id="@+id/title_btn"
+           android:layout_marginEnd="10dp"
+           />
+           <android.support.v7.widget.RecyclerView
+               android:layout_marginTop="5dp"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:id="@+id/name_recycler"
+               android:overScrollMode="never"
+               />
+   </LinearLayout>
+</RelativeLayout>

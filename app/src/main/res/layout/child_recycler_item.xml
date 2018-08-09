@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+            <com.anshi.hjsign.EaseImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:ease_shape_type="round"
+                app:ease_radius="3dp"
+                android:id="@+id/header_iv"
+                app:ease_border_color="@color/color_main"
+                android:src="@drawable/pg_male"
+                />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:textSize="16dp"
+                android:id="@+id/name_tv"
+                android:textColor="#000"
+                tools:ignore="SpUsage" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:id="@+id/status_tv"
+                android:textColor="#000"
+                />
+            <ImageView
+                android:layout_marginStart="5dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:id="@+id/status_iv"
+                android:src="@drawable/green_dot"
+                android:layout_gravity="center_vertical"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
+    </RelativeLayout>
