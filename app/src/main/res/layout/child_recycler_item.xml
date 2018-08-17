@@ -13,20 +13,18 @@
             android:orientation="horizontal"
             tools:ignore="UselessParent">
             <com.anshi.hjsign.EaseImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                app:ease_shape_type="round"
-                app:ease_radius="3dp"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_vertical"
                 android:id="@+id/header_iv"
-                app:ease_border_color="@color/color_main"
-                android:src="@drawable/pg_male"
                 />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:layout_weight="1"
-                android:textSize="16dp"
+                android:textSize="10dp"
+                android:textStyle="bold"
                 android:id="@+id/name_tv"
                 android:textColor="#000"
                 tools:ignore="SpUsage" />
@@ -35,13 +33,15 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:layout_weight="1"
+                android:textSize="8dp"
+                android:visibility="gone"
                 android:id="@+id/status_tv"
-                android:textColor="#000"
-                />
+                android:textColor="#fff"
+                tools:ignore="SpUsage" />
             <ImageView
                 android:layout_marginStart="5dp"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
                 android:id="@+id/status_iv"
                 android:src="@drawable/green_dot"
                 android:layout_gravity="center_vertical"

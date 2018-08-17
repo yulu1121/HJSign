@@ -15,10 +15,12 @@
 package com.anshi.hjsign;
 
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -58,10 +60,12 @@ public class MainActivity extends Activity {
     private CommonAdapter<RoomEntry> mSecondAdapter;
     private TextView mCalendarDay;
     private TextView mCalendarDate;
+    private UiModeManager uiModeManager;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_main);
+        uiModeManager = (UiModeManager) getSystemService(UI_MODE_SERVICE);
         initView();
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_DATE_CHANGED);
@@ -80,7 +84,7 @@ public class MainActivity extends Activity {
                 switch (action){
                     case Intent.ACTION_DATE_CHANGED:
                         mCalendarDay.setText(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
-                        mCalendarDate.setText(getDate());
+                        mCalendarDay.setText(getDate());
                         break;
 
                 }
@@ -102,59 +106,98 @@ public class MainActivity extends Activity {
         mCalendarDate = findViewById(R.id.calendar_date);
         mCalendarDay.setText(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
         mCalendarDate.setText(getDate());
+       // mLineChart = findViewById(R.id.line_chart);
         mLeftRecyclerView = findViewById(R.id.left_recycler);
-        mLeftRecyclerView.setLayoutManager(new GridLayoutManager(this,6));
         mRightRecyclerView = findViewById(R.id.right_recycler);
-        mRightRecyclerView.setLayoutManager(new GridLayoutManager(this,10));
+        if (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION) {
+            mLeftRecyclerView.setLayoutManager(new GridLayoutManager(this,6));
+            mRightRecyclerView.setLayoutManager(new GridLayoutManager(this,8));
+        } else {
+            mLeftRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+            mRightRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        }
         commonAdapter = new CommonAdapter<RoomEntry>(this,R.layout.room_check,mTopList) {
             @Override
-            protected void convert(ViewHolder holder, RoomEntry roomEntry, int position) {
+            protected void convert(ViewHolder holder, final RoomEntry roomEntry, int position) {
                 final List<RoomEntry.RoomPersonEntry> roomPersonEntryList = roomEntry.getRoomPersonEntryList();
                 Button btn = holder.getView(R.id.title_btn);
                 btn.setText(roomEntry.getRoomTitle());
                 RecyclerView mNameRecyclerView =  holder.getView(R.id.name_recycler);
-                if (roomPersonEntryList.size()>5&&roomPersonEntryList.size()<10){
-                  mNameRecyclerView.setLayoutManager(new GridLayoutManager(mContext,2));
-                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(200,getResources())));
-                }else if (roomPersonEntryList.size()>=10){
+                if (roomPersonEntryList.size()>=5){
                     mNameRecyclerView.setLayoutManager(new GridLayoutManager(mContext,2));
-                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(280,getResources())));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(130,getResources())));
+                }else if (roomPersonEntryList.size()==1){
+                    mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(70,getResources())));
+                }else if (roomPersonEntryList.size()==4){
+                    mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(100,getResources())));
                 }else {
                     mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
-                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(180,getResources())));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(82,getResources())));
                 }
-
                 mNameRecyclerView.setAdapter(new CommonAdapter<RoomEntry.RoomPersonEntry>( mContext,R.layout.child_recycler_item,roomPersonEntryList) {
 
                     @Override
                     protected void convert(ViewHolder holder, RoomEntry.RoomPersonEntry roomPersonEntry, int position) {
                         EaseImageView mHeader =  holder.getView(R.id.header_iv);
-
                         TextView mNameTv = holder.getView(R.id.name_tv);
                         TextView mStatusTv = holder.getView(R.id.status_tv);
                         ImageView mStatusIv = holder.getView(R.id.status_iv);
-                        if (roomPersonEntryList.size()>5){
-                            mNameTv.setTextSize(8);
-                            mStatusTv.setTextSize(8);
+                        LinearLayout mRootLayout = holder.getView(R.id.root_layout);
+                        if (roomPersonEntryList.size()==1){
+                            holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                            mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                            mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        }else {
+                            holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                            mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+                            mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        }
+                        if (roomPersonEntryList.size()>4){
+                            mNameTv.setTextSize(6);
+                            mStatusTv.setTextSize(6);
                         }else{
-                            mNameTv.setTextSize(16);
-                            mStatusTv.setTextSize(16);
+                            mNameTv.setTextSize(10);
+                            mStatusTv.setTextSize(10);
                         }
                         switch (roomPersonEntry.getSex()){
                             case "男":
-                                Glide.with(mContext).load(R.drawable.pg_male).into(mHeader);
+                                Glide.with(mContext).load(R.drawable.pg_man_blue_new).into(mHeader);
                                 break;
                             case "女":
-                                Glide.with(mContext).load(R.drawable.pg_femal).into(mHeader);
+                                Glide.with(mContext).load(R.drawable.pg_woman_blue_new).into(mHeader);
                                 break;
-                             default:
-                                 holder.getConvertView().setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                                 mHeader.setVisibility(View.GONE);
-                                 mNameTv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                                 mNameTv.setGravity(Gravity.CENTER);
-                                 break;
+                            default:
+                                switch (roomPersonEntry.getName()){
+                                    case "会议室":
+                                    case "洽谈室":
+                                        Glide.with(mContext).load(R.drawable.pg_dengpao_blue).into(mHeader);
+                                        break;
+                                    case "司机班":
+                                        Glide.with(mContext).load(R.drawable.pg_siji_blue).into(mHeader);
+                                        break;
+                                    case "档案室":
+                                    case "财务部档案室":
+                                        Glide.with(mContext).load(R.drawable.pg_dangan_blue).into(mHeader);
+                                        break;
+                                    case "荣誉室":
+                                        Glide.with(mContext).load(R.drawable.pg_rongyu_blue).into(mHeader);
+                                        break;
+                                    case "机房":
+                                        Glide.with(mContext).load(R.drawable.pg_jifang_blue).into(mHeader);
+                                        break;
+                                    case "土地储备中心":
+                                        Glide.with(mContext).load(R.drawable.pg_ditu_blue).into(mHeader);
+                                        break;
+                                    default:
+                                        mHeader.setVisibility(View.GONE);
+                                        break;
+                                }
+                                break;
                         }
                         mNameTv.setText(roomPersonEntry.getName()==null?"无":roomPersonEntry.getName());
+                        mStatusTv.setVisibility(View.GONE);
                         mStatusTv.setText(roomPersonEntry.getStatus()==null?"无":roomPersonEntry.getStatus());
                         switch (roomPersonEntry.getStatus()){
                             case "在岗":
@@ -164,11 +207,24 @@ public class MainActivity extends Activity {
                                 mStatusIv.setImageResource(R.drawable.red_dot);
                                 break;
                             case "请假":
+                                mStatusIv.setImageResource(R.drawable.yellow_dot);
                             case "出差":
-                                mStatusIv.setImageResource(R.drawable.blue_dot);
+                                mStatusIv.setImageResource(R.drawable.purple_dot);
+                                break;
+                            case "可用":
+                                holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                                mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                mStatusIv.setImageResource(R.drawable.green_dot);
+                                break;
+                            case "使用中":
+                                holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                                mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                mStatusIv.setImageResource(R.drawable.red_dot);
                                 break;
                             default:
-                                holder.getConvertView().setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                                 mStatusIv.setVisibility(View.GONE);
                                 mNameTv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                                 mNameTv.setGravity(Gravity.CENTER);
@@ -185,12 +241,15 @@ public class MainActivity extends Activity {
                 Button btn = holder.getView(R.id.title_btn);
                 btn.setText(roomEntry.getRoomTitle());
                 RecyclerView mNameRecyclerView =  holder.getView(R.id.name_recycler);
-                if (roomPersonEntryList.size()>5){
-                    mNameRecyclerView.setLayoutManager(new GridLayoutManager(mContext,2));
-                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(220,getResources())));
+                if (roomPersonEntryList.size()==1){
+                    mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(75,getResources())));
+                }else if (roomPersonEntryList.size()==4){
+                    mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(100,getResources())));
                 }else {
                     mNameRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false));
-                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(180,getResources())));
+                    holder.getConvertView().setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,dpToPx(81.6f,getResources())));
                 }
 
                 mNameRecyclerView.setAdapter(new CommonAdapter<RoomEntry.RoomPersonEntry>( mContext,R.layout.child_recycler_item,roomPersonEntryList) {
@@ -201,27 +260,89 @@ public class MainActivity extends Activity {
                         TextView mNameTv = holder.getView(R.id.name_tv);
                         TextView mStatusTv = holder.getView(R.id.status_tv);
                         ImageView mStatusIv = holder.getView(R.id.status_iv);
-                        if (roomPersonEntryList.size()>5){
-                            mNameTv.setTextSize(10);
-                            mStatusTv.setTextSize(10);
-                        }else{
-                            mNameTv.setTextSize(16);
-                            mStatusTv.setTextSize(16);
+                        LinearLayout mRootLayout = holder.getView(R.id.root_layout);
+                        mStatusTv.setVisibility(View.GONE);
+                        if (roomPersonEntryList.size()==1){
+                            holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                            mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                            mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                        }else {
+                            holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                            mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+                            mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                         }
                         switch (roomPersonEntry.getSex()){
                             case "男":
-                                Glide.with(mContext).load(R.drawable.pg_male).into(mHeader);
+                                Glide.with(mContext).load(R.drawable.pg_man_blue_new).into(mHeader);
                                 break;
                             case "女":
-                                Glide.with(mContext).load(R.drawable.pg_femal).into(mHeader);
+                                Glide.with(mContext).load(R.drawable.pg_woman_blue_new).into(mHeader);
                                 break;
                             default:
-                                mHeader.setVisibility(View.GONE);
-                                holder.getConvertView().setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                                mNameTv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                                mNameTv.setGravity(Gravity.CENTER);
+                                switch (roomPersonEntry.getName()){
+                                    case "会议室":
+                                    case "洽谈室":
+                                        Glide.with(mContext).load(R.drawable.pg_dengpao_blue).into(mHeader);
+                                        break;
+                                    case "司机班":
+                                        Glide.with(mContext).load(R.drawable.pg_siji_blue).into(mHeader);
+                                        break;
+                                    case "档案室":
+                                    case "财务部档案室":
+                                        Glide.with(mContext).load(R.drawable.pg_dangan_blue).into(mHeader);
+                                        break;
+                                    case "荣誉室":
+                                        Glide.with(mContext).load(R.drawable.pg_rongyu_blue).into(mHeader);
+                                        break;
+                                    case "机房":
+                                        Glide.with(mContext).load(R.drawable.pg_jifang_blue).into(mHeader);
+                                        break;
+                                    case "土地储备中心":
+                                        Glide.with(mContext).load(R.drawable.pg_ditu_blue).into(mHeader);
+                                        break;
+                                    default:
+                                        mHeader.setVisibility(View.GONE);
+                                        break;
+                                }
                                 break;
-                        }
+                       }
+//                        switch (roomPersonEntry.getSex()){
+//                            case "男":
+//                                Glide.with(mContext).load(R.drawable.pg_man_blues).into(mHeader);
+//                                break;
+//                            case "女":
+//                                Glide.with(mContext).load(R.drawable.pg_woman_blues).into(mHeader);
+//                                break;
+//                            default:
+//                                switch (roomPersonEntry.getName()){
+//                                    case "会议室":
+//                                        Glide.with(mContext).load(R.drawable.pg_huiyi).into(mHeader);
+//                                        break;
+//                                    case "洽谈室":
+//                                        Glide.with(mContext).load(R.drawable.pg_qian_tan).into(mHeader);
+//                                        break;
+//                                    case "司机班":
+//                                        Glide.with(mContext).load(R.drawable.pg_siji).into(mHeader);
+//                                        break;
+//                                    case "档案室":
+//                                    case "财务部档案室":
+//                                        Glide.with(mContext).load(R.drawable.pg_dangan).into(mHeader);
+//                                        break;
+//                                    case "荣誉室":
+//                                        Glide.with(mContext).load(R.drawable.pg_rongyu).into(mHeader);
+//                                        break;
+//                                    case "机房":
+//                                        Glide.with(mContext).load(R.drawable.pg_jifang).into(mHeader);
+//                                        break;
+//                                    case "土地储备中心":
+//                                        Glide.with(mContext).load(R.drawable.pg_tudi).into(mHeader);
+//                                        break;
+//                                    default:
+//                                        mHeader.setVisibility(View.GONE);
+//                                        break;
+//                                }
+//                                break;
+//                        }
                         mNameTv.setText(roomPersonEntry.getName()==null?"无":roomPersonEntry.getName());
                         mStatusTv.setText(roomPersonEntry.getStatus()==null?"无":roomPersonEntry.getStatus());
                         switch (roomPersonEntry.getStatus()){
@@ -232,8 +353,21 @@ public class MainActivity extends Activity {
                                 mStatusIv.setImageResource(R.drawable.red_dot);
                                 break;
                             case "请假":
+                                mStatusIv.setImageResource(R.drawable.yellow_dot);
                             case "出差":
-                                mStatusIv.setImageResource(R.drawable.blue_dot);
+                                mStatusIv.setImageResource(R.drawable.purple_dot);
+                                break;
+                            case "可用":
+                                holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                                mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                mStatusIv.setImageResource(R.drawable.green_dot);
+                                break;
+                            case "使用中":
+                                holder.getConvertView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                mRootLayout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                                mStatusTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                mStatusIv.setImageResource(R.drawable.red_dot);
                                 break;
                             default:
                                 holder.getConvertView().setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -251,6 +385,7 @@ public class MainActivity extends Activity {
     }
 
     private String getDate(){
+        //yyyy年MM月dd日 HH:mm:ss
         String dateFormat = "yyyy-MM";
         SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
         return format.format(new Date());
@@ -329,10 +464,10 @@ public class MainActivity extends Activity {
         listOne11.add(new RoomEntry.RoomPersonEntry("男","田海波","请假"));
         mTopList.add(new RoomEntry("304",listOne11));
         List<RoomEntry.RoomPersonEntry> listOne20 = new ArrayList<>();
-        listOne20.add(new RoomEntry.RoomPersonEntry("","会议室",""));
+        listOne20.add(new RoomEntry.RoomPersonEntry("","会议室","可用"));
         mTopList.add(new RoomEntry("305",listOne20));
         List<RoomEntry.RoomPersonEntry> listOne21 = new ArrayList<>();
-        listOne21.add(new RoomEntry.RoomPersonEntry("","洽谈室",""));
+        listOne21.add(new RoomEntry.RoomPersonEntry("","洽谈室","使用中"));
         mTopList.add(new RoomEntry("306",listOne21));
         List<RoomEntry.RoomPersonEntry> listOne12 = new ArrayList<>();
         listOne12.add(new RoomEntry.RoomPersonEntry("男","王建坤","在岗"));
@@ -364,7 +499,7 @@ public class MainActivity extends Activity {
         listOne25.add(new RoomEntry.RoomPersonEntry("","财务部档案室",""));
         mTopList.add(new RoomEntry("404",listOne25));
         List<RoomEntry.RoomPersonEntry> listOne26 = new ArrayList<>();
-        listOne26.add(new RoomEntry.RoomPersonEntry("","会议室",""));
+        listOne26.add(new RoomEntry.RoomPersonEntry("","会议室","使用中"));
         mTopList.add(new RoomEntry("405",listOne26));
         List<RoomEntry.RoomPersonEntry> listOne27 = new ArrayList<>();
         listOne27.add(new RoomEntry.RoomPersonEntry("女","魏晓玲","在岗"));
@@ -406,6 +541,9 @@ public class MainActivity extends Activity {
         listOne32.add(new RoomEntry.RoomPersonEntry("男","任重远","离岗"));
         listOne32.add(new RoomEntry.RoomPersonEntry("男","李瑞杰","在岗"));
         listOne32.add(new RoomEntry.RoomPersonEntry("男","刘斌","在岗"));
+        listOne32.add(new RoomEntry.RoomPersonEntry("女","章胜亚","离岗"));
+        listOne32.add(new RoomEntry.RoomPersonEntry("女","邱凡","在岗"));
+        listOne32.add(new RoomEntry.RoomPersonEntry("女","徐静","在岗"));
         mTopList.add(new RoomEntry("502",listOne32));
         List<RoomEntry.RoomPersonEntry> listOne33= new ArrayList<>();
         listOne33.add(new RoomEntry.RoomPersonEntry("女","万媛","在岗"));
@@ -419,12 +557,9 @@ public class MainActivity extends Activity {
         listOne33.add(new RoomEntry.RoomPersonEntry("女","胡晶婷","在岗"));
         listOne33.add(new RoomEntry.RoomPersonEntry("女","陈守贤","离岗"));
         listOne33.add(new RoomEntry.RoomPersonEntry("女","高月","在岗"));
-        listOne33.add(new RoomEntry.RoomPersonEntry("女","章胜亚","离岗"));
-        listOne33.add(new RoomEntry.RoomPersonEntry("女","邱凡","在岗"));
-        listOne33.add(new RoomEntry.RoomPersonEntry("女","徐静","在岗"));
-        mTopList.add(new RoomEntry("503",listOne33));
+        mTopList.add(new RoomEntry("502",listOne33));
         List<RoomEntry.RoomPersonEntry> listOne34 = new ArrayList<>();
-        listOne34.add(new RoomEntry.RoomPersonEntry("","会议室",""));
+        listOne34.add(new RoomEntry.RoomPersonEntry("","会议室","可用"));
         mTopList.add(new RoomEntry("504",listOne34));
         List<RoomEntry.RoomPersonEntry> listOne35= new ArrayList<>();
         listOne35.add(new RoomEntry.RoomPersonEntry("","/",""));
@@ -463,7 +598,7 @@ public class MainActivity extends Activity {
         listTwo10.add(new RoomEntry.RoomPersonEntry("","/",""));
         mSecondTopList.add(new RoomEntry("110",listTwo10));
         List<RoomEntry.RoomPersonEntry> listTwo11= new ArrayList<>();
-        listTwo11.add(new RoomEntry.RoomPersonEntry("","洽谈室",""));
+        listTwo11.add(new RoomEntry.RoomPersonEntry("","洽谈室","可用"));
         mSecondTopList.add(new RoomEntry("201",listTwo11));
         List<RoomEntry.RoomPersonEntry> listTwo12= new ArrayList<>();
         listTwo12.add(new RoomEntry.RoomPersonEntry("男","徐勇","在岗"));
@@ -505,7 +640,7 @@ public class MainActivity extends Activity {
         listTwo20.add(new RoomEntry.RoomPersonEntry("男","周文杰","在岗"));
         mSecondTopList.add(new RoomEntry("210",listTwo20));
         List<RoomEntry.RoomPersonEntry> listTwo21= new ArrayList<>();
-        listTwo21.add(new RoomEntry.RoomPersonEntry("","洽谈室",""));
+        listTwo21.add(new RoomEntry.RoomPersonEntry("","洽谈室","使用中"));
         mSecondTopList.add(new RoomEntry("301",listTwo21));
         List<RoomEntry.RoomPersonEntry> listTwo22= new ArrayList<>();
         listTwo22.add(new RoomEntry.RoomPersonEntry("男","伍军","在岗"));
@@ -523,7 +658,7 @@ public class MainActivity extends Activity {
         listTwo26.add(new RoomEntry.RoomPersonEntry("男","胡钧","在岗"));
         mSecondTopList.add(new RoomEntry("306",listTwo26));
         List<RoomEntry.RoomPersonEntry> listTwo27= new ArrayList<>();
-        listTwo27.add(new RoomEntry.RoomPersonEntry("","洽谈室",""));
+        listTwo27.add(new RoomEntry.RoomPersonEntry("","洽谈室","可用"));
         mSecondTopList.add(new RoomEntry("307",listTwo27));
         List<RoomEntry.RoomPersonEntry> listTwo28= new ArrayList<>();
         listTwo28.add(new RoomEntry.RoomPersonEntry("男","郝智海","在岗"));
@@ -535,7 +670,7 @@ public class MainActivity extends Activity {
         listTwo30.add(new RoomEntry.RoomPersonEntry("男","陈建伟","在岗"));
         mSecondTopList.add(new RoomEntry("310",listTwo30));
         List<RoomEntry.RoomPersonEntry> listTwo31= new ArrayList<>();
-        listTwo31.add(new RoomEntry.RoomPersonEntry("","洽谈室",""));
+        listTwo31.add(new RoomEntry.RoomPersonEntry("","洽谈室","使用中"));
         mSecondTopList.add(new RoomEntry("401",listTwo31));
         List<RoomEntry.RoomPersonEntry> listTwo32= new ArrayList<>();
         listTwo32.add(new RoomEntry.RoomPersonEntry("男","胡顺成","在岗"));
@@ -612,6 +747,8 @@ public class MainActivity extends Activity {
         listTwo50.add(new RoomEntry.RoomPersonEntry("女","邓越敏","在岗"));
         listTwo50.add(new RoomEntry.RoomPersonEntry("女","彭诗园","在岗"));
         mSecondTopList.add(new RoomEntry("510",listTwo50));
+
+
 //        for (int i = 1; i <11 ; i++) {
 //            List<RoomEntry.RoomPersonEntry> listTwo = new ArrayList<>();
 //            listTwo.add(new RoomEntry.RoomPersonEntry("男","行文","在岗"));

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@drawable/hj_back"
+    android:background="@drawable/back_six"
     android:layout_height="match_parent"
     >
     <LinearLayout
@@ -15,18 +15,29 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             >
-            <ImageView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#ff00"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="5dp"
+                />
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:contentDescription="@null"
-                android:src="@drawable/hj_logo_back"
-                android:layout_marginTop="20dp"
+                android:src="@drawable/hj_logo_back_3"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="20dp"
                 />
             <LinearLayout
                 android:layout_width="50dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="5dp"
+                android:alpha="0.7"
                 android:orientation="vertical"
                 android:layout_marginEnd="10dp"
                 android:layout_alignParentEnd="true"
@@ -38,7 +49,6 @@
                     android:textColor="#fff"
                     android:layout_weight="3"
                     android:textStyle="bold"
-
                     android:id="@+id/calendar_day"
                     android:gravity="center"
                     android:textSize="25dp"
@@ -52,9 +62,6 @@
                     android:gravity="center"
                     android:textSize="12dp"
                     tools:ignore="SpUsage" />
-
-
-
             </LinearLayout>
 
             <TextView
@@ -65,7 +72,7 @@
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:layout_centerInParent="true"
-                android:text="每日考勤"
+                android:text="岗位出勤总览"
                 tools:ignore="SpUsage" />
 
             <RelativeLayout
@@ -90,8 +97,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="在岗"
+                        android:text="在岗/房间可用"
                         android:textColor="#000"
+                        android:textStyle="bold"
                         />
                     <ImageView
                         android:layout_width="10dp"
@@ -104,7 +112,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="离岗"
+                        android:text="离岗/房间使用中"
+                        android:textStyle="bold"
                         android:textColor="#000"
 
                         />
@@ -114,12 +123,28 @@
                         android:contentDescription="@null"
                         android:layout_marginStart="5dp"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/blue_dot"
+                        android:src="@drawable/yellow_dot"
                         />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="请假/出差"
+                        android:text="请假"
+                        android:textStyle="bold"
+                        android:textColor="#000"
+                        />
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:contentDescription="@null"
+                        android:layout_marginStart="5dp"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/purple_dot"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="出差"
+                        android:textStyle="bold"
                         android:textColor="#000"
                         />
                 </LinearLayout>
@@ -134,15 +159,17 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:text="@string/north_kaoqin"
                 android:textColor="#000"
-                android:text="北楼员工考勤情况"
+                android:textStyle="bold"
                 android:gravity="center"
                 />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="南楼员工考勤情况"
+                android:textStyle="bold"
+                android:text="@string/south_kaoqin"
                 android:textColor="#000"
                 android:gravity="center"
                 />
@@ -150,14 +177,12 @@
 
 
     </LinearLayout>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_below="@+id/top_layout"
-        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:layout_below="@id/top_layout"
             android:layout_gravity="center_vertical"
             android:baselineAligned="false"
             tools:ignore="UselessParent">
@@ -169,28 +194,68 @@
                 >
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_centerInParent="true"
                     android:id="@+id/left_recycler"
                     android:overScrollMode="never"
                     />
             </RelativeLayout>
-            <RelativeLayout
+            <FrameLayout
                 android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                >
-                <android.support.v7.widget.RecyclerView
+                android:layout_height="match_parent">
+                <RelativeLayout
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/right_recycler"
+                        android:overScrollMode="never"
+                        />
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/right_recycler"
-                    android:overScrollMode="never"
-                    />
-            </RelativeLayout>
+                    android:layout_gravity="bottom|end"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp"
+                    tools:ignore="UseCompoundDrawables">
+                    <!--<com.anshi.hjsign.ScaleView-->
+                    <!--android:layout_width="180dp"-->
+                    <!--android:layout_height="10dp"-->
+                    <!--android:layout_marginBottom="5dp"-->
+                    <!--android:layout_gravity="center|end"-->
+                    <!--android:id="@+id/line_chart"-->
+
+                    <!--/>-->
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/hj_qr"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textColor="#000"
+                        android:gravity="center|start"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:text="到岗139人,离岗7人,请假3人,出差1人"
+                        tools:ignore="SpUsage" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
         </LinearLayout>
-    </FrameLayout>
 </RelativeLayout>

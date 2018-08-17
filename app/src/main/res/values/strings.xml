@@ -16,4 +16,6 @@
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>
     <string name="dismiss_error">Dismiss</string>
+    <string name="north_kaoqin">北楼员工考勤情况</string>
+    <string name="south_kaoqin">南楼员工考勤情况</string>
 </resources>

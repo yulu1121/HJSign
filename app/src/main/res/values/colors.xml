@@ -10,4 +10,8 @@
     <color name="color_main">#4FE1FC</color>
     <color name="transparent">#00000000</color>
     <color name="transparent_half">#66000000</color>
+    <color name="red">#FF0000</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="green">#00FF00</color>
+    <color name="purple">#ff00ff</color>
 </resources>
